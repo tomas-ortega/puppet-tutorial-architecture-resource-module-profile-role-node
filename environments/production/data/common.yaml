@@ -1,0 +1,41 @@
+apache_worker_factor: 100
+app_armor_enabled: false
+
+
+evaluate_type_string: '100'
+evaluate_type_boolean: true
+evaluate_type_integer: 12345
+evaluate_type_colour_array:
+  - 'Blue'
+  - 'Orange'
+  - 'Black'
+  - 'Green'
+
+database_backup_path: "/backup/%{facts.hostname}"
+
+ips:
+  home: '130.190.0.1'
+  office1: '74.12.203.14'
+  office2: '95.170.0.75'
+firewall_allow_list:
+  - "%{lookup('ips.home')}"
+  - "%{lookup('ips.office1')}"
+  - "%{lookup('ips.office2')}"
+
+phones:
+  police: '911'
+  emergency: '061'
+  firefighters: '055'
+phone_call_list:
+    - "%{lookup('phones.police')}"
+    - "%{lookup('phones.emergency')}"
+    - "%{lookup('phones.firefighters')}"
+vpn_allow_list: "%{alias('phone_call_list')}"
+
+force_www_rewrite:
+  comment: "Force WWW"
+  rewrite_cond: "%{literal('%')}{HTTP_HOST} !^www\\. [NC]"
+  rewrite_rule: "^(.*)$ https://www.%{literal('%')}{HTTP_HOST}%{literal('%')}{REQUEST_URI} [R=301,L]"
+
+parameterized_class_hiera::webserver: 'nginx'
+parameterized_class_hiera::user_name: 'Pakito'
